@@ -1,8 +1,8 @@
-# acm-template-pro-generator
+# ${name}
 
-> ACM 示例模板生成器
+> ${description}
 >
-> 作者：yyy
+> 作者：${author}
 >
 > [代码生成器项目](https://github.com/yyyFG/y-CodeGenerator) 制作，感谢您的使用！
 
