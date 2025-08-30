@@ -1,11 +1,14 @@
 package cn.y;
 
-import cn.y.cli.CommandExecutor;
+import cn.y.generator.main.MainGenerator;
+import freemarker.template.TemplateException;
+
+import java.io.IOException;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
 //        // 获取整个项目的根路径
 //        String projectPath = System.getProperty("user.dir");
 //        System.out.println(projectPath);
@@ -22,7 +25,10 @@ public class Main {
 //        args = new String[]{"config"};
 //        args = new String[]{"list"};
 
-        CommandExecutor commandExecutor = new CommandExecutor();
-        commandExecutor.doExecute(args);
+//        CommandExecutor commandExecutor = new CommandExecutor();
+//        commandExecutor.doExecute(args);
+
+        MainGenerator mainGenerator = new MainGenerator();
+        mainGenerator.doGenerate();
     }
 }

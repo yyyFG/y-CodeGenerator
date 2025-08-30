@@ -7,7 +7,7 @@
   "createTime": "2023-11-22",
   "fileConfig": {
     "inputRootPath": ".source/acm-template",
-    "outputRootPath": "D:/code/y-CodeGenerator/acm-template",
+    "outputRootPath": "D:/code/y-CodeGenerator/y-codegenerator-maker/generated/acm-template-pro-generator/generated",
     "sourceRootPath": "D:/code/y-CodeGenerator/y-generator-demo-project/acm-template",
     "type": "dir",
     "files": [
@@ -15,13 +15,15 @@
         "inputPath": "src/cn/y/acm/MainTemplate.java.ftl",
         "outputPath": "src/cn/y/acm/MainTemplate.java",
         "type": "file",
-        "generateType": "dynamic"
+        "generateType": "dynamic",
+        "condition": "needGit"
       },
       {
         "inputPath": ".gitignore",
         "outputPath": ".gitignore",
         "type": "file",
-        "generateType": "static"
+        "generateType": "static",
+        "condition": "needGit"
       },
       {
         "inputPath": "README.md",
@@ -33,6 +35,13 @@
   },
   "modelConfig": {
     "models": [
+      {
+        "fieldName": "needGit",
+        "type": "boolean",
+        "description": "是否生成 .gitignore 文件",
+        "defaultValue": true,
+        "abbr": "g"
+      },
       {
         "fieldName": "loop",
         "type": "boolean",

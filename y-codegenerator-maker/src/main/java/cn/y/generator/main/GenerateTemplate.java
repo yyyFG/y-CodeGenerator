@@ -8,7 +8,6 @@ import cn.y.generator.file.JarGenerator;
 import cn.y.generator.file.ScriptGenerator;
 import cn.y.meta.Meta;
 import cn.y.meta.MetaManager;
-import com.sun.org.apache.bcel.internal.generic.RET;
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -159,21 +158,21 @@ public abstract class GenerateTemplate {
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
         // MainGenerator.java.ftl
-        inputFilePath = inputResourcePath + "template/java/generator/MainGenerator.java.ftl";
+        inputFilePath = inputResourcePath + "template/java/generator/main/MainGenerator.java.ftl";
 //        System.out.println(inputFilePath);
         outputFilePath = outputBaseJavaPackagePath + "/generator/main/MainGenerator.java";
 //        System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
         // DynamicGenerator.java.ftl
-        inputFilePath = inputResourcePath + "template/java/generator/DynamicGenerator.java.ftl";
+        inputFilePath = inputResourcePath + "template/java/generator/file/DynamicGenerator.java.ftl";
 //        System.out.println(inputFilePath);
         outputFilePath = outputBaseJavaPackagePath + "/generator/file/DynamicGenerator.java";
 //        System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
         // StaticGenerator.java.ftl
-        inputFilePath = inputResourcePath + "template/java/generator/StaticGenerator.java.ftl";
+        inputFilePath = inputResourcePath + "template/java/generator/file/StaticGenerator.java.ftl";
 //        System.out.println(inputFilePath);
         outputFilePath = outputBaseJavaPackagePath + "/generator/file/StaticGenerator.java";
 //        System.out.println(outputFilePath);
@@ -204,7 +203,7 @@ public abstract class GenerateTemplate {
         // 复制原始文件
         String sourceRootPath = meta.getFileConfig().getSourceRootPath();
         String sourceCopyDestPath = outputPath + File.separator + ".source";
-        FileUtil.copy(sourceRootPath, sourceCopyDestPath, false);
+        FileUtil.copy(sourceRootPath, sourceCopyDestPath, true);
 
         return sourceCopyDestPath;
     }
