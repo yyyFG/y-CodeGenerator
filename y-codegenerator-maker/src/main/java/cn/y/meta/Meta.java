@@ -34,8 +34,11 @@ public class Meta {
             private String inputPath;
             private String outputPath;
             private String type;
+            private String groupKey;
+            private String groupName;
             private String generateType;
             private String condition;
+            private List<FileInfo> files;
         }
     }
 
@@ -52,6 +55,9 @@ public class Meta {
             private String description;
             private Object defaultValue;
             private String abbr;
+            private String groupKey;
+            private String groupName;
+            private List<ModelInfo> models;
         }
     }
 }
