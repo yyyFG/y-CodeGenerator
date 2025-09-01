@@ -19,7 +19,7 @@ public class FileGenerator {
         StaticFileGenertor.copyFilesByHutools(inputFilePath, outputFilePath);
 
         String inputDynamicFilePath = projectPath + File.separator + "y-codegenerator-maker/src/main/resources/template/";
-        String outputDynamicFilePath = outputFilePath + File.separator + "acm-template/src/com/yupi/acm/MainTemplate.java";
+        String outputDynamicFilePath = outputFilePath + File.separator + "acm-template/src/cn/y/acm/MainTemplate.java";
 
         DynamicFileGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, model);
     }

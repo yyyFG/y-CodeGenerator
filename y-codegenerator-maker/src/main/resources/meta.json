@@ -4,7 +4,7 @@
   "basePackage": "cn.y",
   "version": "1.0",
   "author": "yyy",
-  "createTime": "2023-11-22",
+  "createTime": "2025-8-10",
   "fileConfig": {
     "inputRootPath": ".source/acm-template",
     "outputRootPath": "D:/code/y-CodeGenerator/y-codegenerator-maker/generated/acm-template-pro-generator/generated",
@@ -56,10 +56,14 @@
         "abbr": "l"
       },
       {
+        "fieldName": "MainTemplate",
         "groupKey": "mainTemplate",
         "groupName": "核心模板",
         "type": "MainTemplate",
-        "description": "用于生成核心模板",
+        "description": "用于生成核心模板文件",
+        "defaultValue":  true,
+        "condition": "loop",
+        "abbr": "m",
         "models": [
           {
             "fieldName": "author",
