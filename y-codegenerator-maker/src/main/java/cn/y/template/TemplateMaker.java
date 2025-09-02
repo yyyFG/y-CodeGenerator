@@ -2,6 +2,7 @@ package cn.y.template;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -16,9 +17,7 @@ import cn.y.template.models.TemplateMakerFileConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -26,7 +25,7 @@ public class TemplateMaker {
 
 
     /**
-     *  制作文件模板
+     * 制作文件模板
      *
      * @param modelInfo
      * @param searchStr
@@ -34,7 +33,7 @@ public class TemplateMaker {
      * @param inputFile
      * @return
      */
-    private static Meta.FileConfig.FileInfo makeFileTemplate(Meta.ModelConfig.ModelInfo modelInfo, String searchStr, String sourceRootPath, File inputFile){
+    private static Meta.FileConfig.FileInfo makeFileTemplate(Meta.ModelConfig.ModelInfo modelInfo, String searchStr, String sourceRootPath, File inputFile) {
         // 要挖坑的文件绝对路径（用于制作模板）
         // 注意 win 系统需要对绝对路径进行转义
         String fileInputAbsolutePath = inputFile.getAbsolutePath().replaceAll("\\\\", "/");
@@ -48,7 +47,7 @@ public class TemplateMaker {
         // 使用字符串替换，生成模板文件
         String fileContent;
         // 如果已有模板，说明不是第一次制作，则在模板基础上再次挖坑
-        if (FileUtil.exist(fileOutputAbsolutePath)){
+        if (FileUtil.exist(fileOutputAbsolutePath)) {
             fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
         } else {
             System.out.println(fileInputAbsolutePath);
@@ -64,11 +63,11 @@ public class TemplateMaker {
         fileInfo.setType(FileTypeEnum.FILE.getValue());
 
         // 和原文件一致，没有挖坑，则为静态生成
-        if(newFileContent.equals(fileContent)){
+        if (newFileContent.equals(fileContent)) {
             // 输出路径 = 输入路径
             fileInfo.setOutputPath(fileInputPath);
             fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
-        }else {
+        } else {
             // 生成模板文件
             fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
@@ -80,9 +79,10 @@ public class TemplateMaker {
 
     /**
      * 制作模板
+     *
      * @param newMeta
      * @param originalProjectPath
-     * @param inputFilePathList
+     * @param templateMakerFileConfig
      * @param modelInfo
      * @param searchStr
      * @param id
@@ -93,10 +93,10 @@ public class TemplateMaker {
                                     TemplateMakerFileConfig templateMakerFileConfig,
                                     Meta.ModelConfig.ModelInfo modelInfo,
                                     String searchStr,
-                                    Long id){
+                                    Long id) {
 
         // 没有 id 则生成
-        if (id == null){
+        if (id == null) {
             id = IdUtil.getSnowflakeNextId();
         }
 
@@ -107,7 +107,7 @@ public class TemplateMaker {
 
         // 是否首次制作模板
         // 目录不存在，则是首次制作
-        if (!FileUtil.exist(templatePath)){
+        if (!FileUtil.exist(templatePath)) {
             FileUtil.mkdir(templatePath);
             FileUtil.copy(originalProjectPath, templatePath, true);
         }
@@ -122,17 +122,17 @@ public class TemplateMaker {
         // 二、生成文件模板
         // 遍历输入文件
         List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>();
-        for (TemplateMakerFileConfig.FileInfoConfig fileInfoConfig : fileInfoConfigList){
+        for (TemplateMakerFileConfig.FileInfoConfig fileInfoConfig : fileInfoConfigList) {
             String inputFilePath = fileInfoConfig.getPath();
 
             // 如果填的是相对路径，要改成绝对路径
-            if (!inputFilePath.startsWith(sourceRootPath)){
+            if (!inputFilePath.startsWith(sourceRootPath)) {
                 inputFilePath = sourceRootPath + File.separator + inputFilePath;
             }
 
             // 获取过滤后的文件列表（不会存在目录）
             List<File> fileList = FileFilter.doFilter(inputFilePath, fileInfoConfig.getFilterConfigList());
-            for (File file : fileList){
+            for (File file : fileList) {
                 Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(modelInfo, searchStr, sourceRootPath, file);
                 newFileInfoList.add(fileInfo);
             }
@@ -141,8 +141,28 @@ public class TemplateMaker {
         // 三、 生成配置文件
         String metaOutputPath = sourceRootPath + File.separator + "meta.json";
 
+        // 如果是文件组
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = new TemplateMakerFileConfig.FileGroupConfig();
+        if (fileGroupConfig != null) {
+            String condition = fileGroupConfig.getCondition();
+            String groupKey = fileGroupConfig.getGroupKey();
+            String groupName = fileGroupConfig.getGroupName();
+
+            // 新增分组配置
+            Meta.FileConfig.FileInfo groupFileInfo = new Meta.FileConfig.FileInfo();
+            groupFileInfo.setType(FileTypeEnum.GROUP.getValue());
+            groupFileInfo.setCondition(condition);
+            groupFileInfo.setGroupKey(groupKey);
+            groupFileInfo.setGroupName(groupName);
+            // 文件全放到一个分组内
+            groupFileInfo.setFiles(newFileInfoList);
+            newFileInfoList = new ArrayList<>();
+            newFileInfoList.add(groupFileInfo);
+        }
+
+
         // 如果已有 meta 文件，说明不是第一次制作，则在 meta 基础上进行修改
-        if (FileUtil.exist(metaOutputPath)){
+        if (FileUtil.exist(metaOutputPath)) {
             Meta oldMeta = JSONUtil.toBean(FileUtil.readUtf8String(metaOutputPath), Meta.class);
             BeanUtil.copyProperties(newMeta, oldMeta, CopyOptions.create().ignoreNullValue());
             newMeta = oldMeta;
@@ -157,7 +177,7 @@ public class TemplateMaker {
             newMeta.getFileConfig().setFiles(distinctFiles(fileInfoList));
             newMeta.getModelConfig().setModels(distinctModels(modelInfoList));
 
-        }else {
+        } else {
             // 1. 构造配置参数
             Meta.FileConfig fileConfig = new Meta.FileConfig();
             newMeta.setFileConfig(fileConfig);
@@ -182,10 +202,11 @@ public class TemplateMaker {
 
     /**
      * 模型去重
+     *
      * @param modelInfoList
      * @return
      */
-    private static List<Meta.ModelConfig.ModelInfo> distinctModels(List<Meta.ModelConfig.ModelInfo> modelInfoList){
+    private static List<Meta.ModelConfig.ModelInfo> distinctModels(List<Meta.ModelConfig.ModelInfo> modelInfoList) {
         List<Meta.ModelConfig.ModelInfo> newModelInfoList = new ArrayList<>(modelInfoList.stream()
                 .collect(Collectors.toMap(Meta.ModelConfig.ModelInfo::getFieldName, o -> o, (e, r) -> r)).values());
         return newModelInfoList;
@@ -194,13 +215,52 @@ public class TemplateMaker {
 
     /**
      * 文件去重
+     *
      * @param fileInfoList
      * @return
      */
-    private static List<Meta.FileConfig.FileInfo> distinctFiles(List<Meta.FileConfig.FileInfo> fileInfoList){
-        List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(fileInfoList.stream()
+    private static List<Meta.FileConfig.FileInfo> distinctFiles(List<Meta.FileConfig.FileInfo> fileInfoList) {
+        // 1. 将所有文件配置（fileInfo）
+        // 2. 对于有分组的文件配置，如果有时间的分组
+        // 3. 创建新的文件配置列表（结果列表），先将合并后的分组添加到结果列表
+        // 4。再将无分组的文件配置列表添加到结果列博熬
+
+        // 1. 有分组的，以组为单位划分
+        Map<String, List<Meta.FileConfig.FileInfo>> groupKeyFileInfoListMap = fileInfoList
+                .stream()
+                .filter(fileInfo -> StrUtil.isNotBlank(fileInfo.getGroupKey()))
+                .collect(Collectors.groupingBy(Meta.FileConfig.FileInfo::getGroupKey));
+
+        // 2. 同组内的文件配置合并
+        // 保存每个组对应的合并后的对象 map
+        Map<String, Meta.FileConfig.FileInfo> groupKeyMergedFileInfoMap = new HashMap<>();
+        for (Map.Entry<String, List<Meta.FileConfig.FileInfo>> entry : groupKeyFileInfoListMap.entrySet()) {
+            List<Meta.FileConfig.FileInfo> tempFileInfoList = entry.getValue();
+            List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(tempFileInfoList
+                    .stream()
+                    .flatMap(fileInfo -> fileInfo.getFiles().stream())
+                    .collect(
+                            Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)
+                    ).values());
+
+            // 使用新的 group 配置
+            Meta.FileConfig.FileInfo newFileInfo = CollUtil.getLast(tempFileInfoList);
+            newFileInfo.setFiles(newFileInfoList);
+            String groupKey = entry.getKey();
+            groupKeyMergedFileInfoMap.put(groupKey, newFileInfo);
+        }
+
+        // 3. 将文件分组添加到结果列表
+        List<Meta.FileConfig.FileInfo> resultList = new ArrayList<>(groupKeyMergedFileInfoMap.values());
+
+        List<Meta.FileConfig.FileInfo> noGroupFileInfoList = fileInfoList
+                .stream()
+                .filter(fileInfo -> StrUtil.isBlank(fileInfo.getGroupKey()))
+                .collect(Collectors.toList());
+        resultList.addAll(new ArrayList<>(noGroupFileInfoList).stream()
                 .collect(Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)).values());
-        return newFileInfoList;
+
+        return resultList;
     }
 
     public static void main(String[] args) {
@@ -250,7 +310,14 @@ public class TemplateMaker {
         fileInfoConfig2.setPath(inputFilePath2);
         templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1, fileInfoConfig2));
 
-        long id =makeTemplate(meta, originalProjectPath, templateMakerFileConfig, modelInfo, searchStr, 1962779545046540288L);
+        // 分组配置
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = new TemplateMakerFileConfig.FileGroupConfig();
+        fileGroupConfig.setCondition("outputText");
+        fileGroupConfig.setGroupKey("test");
+        fileGroupConfig.setGroupName("测试分组");
+        templateMakerFileConfig.setFileGroupConfig(fileGroupConfig);
+
+        long id = makeTemplate(meta, originalProjectPath, templateMakerFileConfig, modelInfo, searchStr, 1962779545046540288L);
         System.out.println(id);
 
     }
