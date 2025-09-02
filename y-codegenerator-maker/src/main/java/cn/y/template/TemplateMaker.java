@@ -49,10 +49,11 @@ public class TemplateMaker {
         // 使用字符串替换，生成模板文件
         String fileContent;
         // 如果已有模板，说明不是第一次制作，则在模板基础上再次挖坑
-        if (FileUtil.exist(fileOutputAbsolutePath)) {
+        boolean hasTemplateFile = FileUtil.exist(fileOutputAbsolutePath);
+        if (hasTemplateFile) {
             fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
         } else {
-            System.out.println(fileInputAbsolutePath);
+//            System.out.println(fileInputAbsolutePath);
             fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
         }
 
@@ -79,6 +80,24 @@ public class TemplateMaker {
         fileInfo.setInputPath(fileInputPath);
         fileInfo.setOutputPath(fileOutputPath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
+        fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
+
+        // 是否更改了文件内容
+        boolean contentEquals = newFileContent.equals(fileContent);
+        // 之前不存在模板文件，并且没有更改文件内容，则为静态生成
+        if (!hasTemplateFile){
+            if (contentEquals){
+                // 静态路径 = 输入路径
+                fileInfo.setOutputPath(fileInputPath);
+                fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
+            } else {
+                // 没有模板文件，需要挖坑，生成模板文件
+                FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
+            }
+        } else if (!contentEquals){
+            // 有模板文件，且增加了新坑，生成模板文件
+            FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
+        }
 
         // 和原文件一致，没有挖坑，则为静态生成
         if (newFileContent.equals(fileContent)) {
