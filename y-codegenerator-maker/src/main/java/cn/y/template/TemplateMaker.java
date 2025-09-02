@@ -13,6 +13,7 @@ import cn.y.meta.enums.FileFilterRuleEnum;
 import cn.y.meta.enums.FileGenerateTypeEnum;
 import cn.y.meta.enums.FileTypeEnum;
 import cn.y.template.models.FileFilterConfig;
+import cn.y.template.models.TemplateMakerConfig;
 import cn.y.template.models.TemplateMakerFileConfig;
 import cn.y.template.models.TemplateMakerModelConfig;
 
@@ -271,6 +272,22 @@ public class TemplateMaker {
 
     }
 
+
+    /**
+     * 模板生成
+     *
+     * @param templateMakerConfig
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerConfig){
+        Meta meta = templateMakerConfig.getMeta();
+        String originalProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig templateMakerFileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig templateMakerModelConfig = templateMakerConfig.getModelConfig();
+        Long id = templateMakerConfig.getId();
+
+        return makeTemplate(meta, originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, id);
+    }
 
     /**
      * 模型去重
