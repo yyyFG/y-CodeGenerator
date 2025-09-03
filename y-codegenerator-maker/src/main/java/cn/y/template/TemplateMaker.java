@@ -13,10 +13,7 @@ import cn.y.meta.enums.FileFilterRangeEnum;
 import cn.y.meta.enums.FileFilterRuleEnum;
 import cn.y.meta.enums.FileGenerateTypeEnum;
 import cn.y.meta.enums.FileTypeEnum;
-import cn.y.template.models.FileFilterConfig;
-import cn.y.template.models.TemplateMakerConfig;
-import cn.y.template.models.TemplateMakerFileConfig;
-import cn.y.template.models.TemplateMakerModelConfig;
+import cn.y.template.models.*;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -131,6 +128,7 @@ public class TemplateMaker {
                                     String originalProjectPath,
                                     TemplateMakerFileConfig templateMakerFileConfig,
                                     TemplateMakerModelConfig templateMakerModelConfig,
+                                    TemplateMakerOutputConfig templateMakerOutputConfig,
                                     Long id) {
 
         // 没有 id 则生成
@@ -203,8 +201,18 @@ public class TemplateMaker {
             modelInfoList.addAll(newModelInfoList);
         }
 
-        // 2. 输出元信息文件
+        // 2. 额外的输出配置
+        if (templateMakerOutputConfig != null){
+            // 文件外层和分组去重
+            if (templateMakerOutputConfig.isRemoveGroupFilesFromRoot()){
+                List<Meta.FileConfig.FileInfo> fileInfoList = newMeta.getFileConfig().getFiles();
+                newMeta.getFileConfig().setFiles(TemplateMakerUtils.removeGroupFiles(fileInfoList));
+            }
+        }
+
+        // 3. 输出元信息文件
         FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(newMeta), metaOutputPath);
+
         return id;
 
     }
@@ -221,9 +229,10 @@ public class TemplateMaker {
         String originalProjectPath = templateMakerConfig.getOriginProjectPath();
         TemplateMakerFileConfig templateMakerFileConfig = templateMakerConfig.getFileConfig();
         TemplateMakerModelConfig templateMakerModelConfig = templateMakerConfig.getModelConfig();
+        TemplateMakerOutputConfig templateMakerOutputConfig = templateMakerConfig.getOutputConfig();
         Long id = templateMakerConfig.getId();
 
-        return makeTemplate(meta, originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, id);
+        return makeTemplate(meta, originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, templateMakerOutputConfig, id);
     }
 
     /**
@@ -417,7 +426,7 @@ public class TemplateMaker {
         fileGroupConfig.setGroupName("测试分组");
         templateMakerFileConfig.setFileGroupConfig(fileGroupConfig);
 
-        long id = makeTemplate(meta, originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1962779545046540288L);
+        long id = makeTemplate(meta, originalProjectPath, templateMakerFileConfig, templateMakerModelConfig, null, 1962779545046540288L);
         System.out.println(id);
 
     }
