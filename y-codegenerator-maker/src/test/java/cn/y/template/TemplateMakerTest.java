@@ -97,7 +97,7 @@ public class TemplateMakerTest {
      * 制作 SpringBoot 模板
      */
     @Test
-    public void makeSpringBootTemplate() {
+    public void makeSpringBootTemplate0() {
         String rootPath = "examples/springboot-init/";
         String configStr = ResourceUtil.readUtf8Str(rootPath + "templateMaker.json");
         TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
@@ -105,5 +105,17 @@ public class TemplateMakerTest {
         System.out.println(id);
     }
 
+    @Test
+    public void makeSpringBootTemplate() {
+        String rootPath = "examples/springboot-init/";
+        String configStr = ResourceUtil.readUtf8Str(rootPath + "templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
+
+        configStr = ResourceUtil.readUtf8Str(rootPath + "templateMaker1.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
+        System.out.println(id);
+    }
 
 }
