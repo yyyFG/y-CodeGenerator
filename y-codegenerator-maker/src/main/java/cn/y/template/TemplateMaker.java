@@ -34,7 +34,8 @@ public class TemplateMaker {
      */
     private static Meta.FileConfig.FileInfo makeFileTemplate(TemplateMakerModelConfig templateMakerModelConfig,
                                                              String sourceRootPath,
-                                                             File inputFile) {
+                                                             File inputFile,
+                                                             TemplateMakerFileConfig.FileInfoConfig fileInfoConfig) {
 
         // 要挖坑的文件绝对路径（用于制作模板）
         // 注意 win 系统需要对绝对路径进行转义
@@ -79,6 +80,7 @@ public class TemplateMaker {
         // 注意文件输入路径要和输出路劲反转
         fileInfo.setInputPath(fileOutputPath);
         fileInfo.setOutputPath(fileInputPath);
+        fileInfo.setCondition(fileInfoConfig.getCondition());
         fileInfo.setType(FileTypeEnum.FILE.getValue());
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
@@ -462,7 +464,7 @@ public class TemplateMaker {
                     .filter(file -> !file.getAbsolutePath().endsWith(".ftl"))
                     .collect(Collectors.toList());
             for (File file : fileList){
-                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakerModelConfig, sourceRootPath, file);
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakerModelConfig, sourceRootPath, file, fileInfoConfig);
                 newFileInfoList.add(fileInfo);
             }
         }
@@ -488,6 +490,7 @@ public class TemplateMaker {
 
         return newFileInfoList;
     }
+
 
     private static List<Meta.ModelConfig.ModelInfo> getModelsInfoList(TemplateMakerModelConfig templateMakerModelConfig){
         // 本次新增的模型配置列表
