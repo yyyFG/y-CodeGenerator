@@ -1,9 +1,7 @@
-package ${basePackage}.generator.main;
+package ${basePackage}.generator;
 
-import ${basePackage}.model.DataModel;
+import cn.y.model.DataModel;
 import freemarker.template.TemplateException;
-import ${basePackage}.generator.file.DynamicGenerator;
-import ${basePackage}.generator.file.StaticGenerator;
 
 import java.io.File;
 import java.io.IOException;

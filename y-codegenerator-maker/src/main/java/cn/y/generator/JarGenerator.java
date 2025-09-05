@@ -1,6 +1,7 @@
-package cn.y.generator.file;
+package cn.y.generator;
 
 import java.io.*;
+import java.util.Map;
 
 public class JarGenerator {
 

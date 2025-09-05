@@ -4,8 +4,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
 import cn.y.generator.file.DynamicFileGenerator;
-import cn.y.generator.file.JarGenerator;
-import cn.y.generator.file.ScriptGenerator;
+import cn.y.generator.JarGenerator;
+import cn.y.generator.ScriptGenerator;
 import cn.y.meta.Meta;
 import cn.y.meta.MetaManager;
 import freemarker.template.TemplateException;
@@ -52,11 +52,11 @@ public abstract class GenerateTemplate {
      * @param shellOutputFilePath
      */
     protected void buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath){
-        String distOutputPath = outputPath + File.separator + "-dist";
+        String distOutputPath = outputPath + "-dist";
         // 拷贝 jar 包
         String targetAbsolutePath = distOutputPath + File.separator + "target";
         FileUtil.mkdir(targetAbsolutePath);
-        String jarAbsolutePath = targetAbsolutePath + File.separator + jarPath;
+        String jarAbsolutePath = outputPath + File.separator + jarPath;
         FileUtil.copy(jarAbsolutePath, targetAbsolutePath, true);
         // 拷贝脚本文件
         FileUtil.copy(shellOutputFilePath, distOutputPath, true);
@@ -158,21 +158,21 @@ public abstract class GenerateTemplate {
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
         // MainGenerator.java.ftl
-        inputFilePath = inputResourcePath + File.separator + "template/java/generator/main/MainGenerator.java.ftl";
+        inputFilePath = inputResourcePath + File.separator + "template/java/generator/MainGenerator.java.ftl";
 //        System.out.println(inputFilePath);
         outputFilePath = outputBaseJavaPackagePath + "/generator/main/MainGenerator.java";
 //        System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
         // DynamicGenerator.java.ftl
-        inputFilePath = inputResourcePath + File.separator + "template/java/generator/file/DynamicGenerator.java.ftl";
+        inputFilePath = inputResourcePath + File.separator + "template/java/generator/DynamicGenerator.java.ftl";
 //        System.out.println(inputFilePath);
         outputFilePath = outputBaseJavaPackagePath + "/generator/file/DynamicGenerator.java";
 //        System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
         // StaticGenerator.java.ftl
-        inputFilePath = inputResourcePath + File.separator + "template/java/generator/file/StaticGenerator.java.ftl";
+        inputFilePath = inputResourcePath + File.separator + "template/java/generator/StaticGenerator.java.ftl";
 //        System.out.println(inputFilePath);
         outputFilePath = outputBaseJavaPackagePath + "/generator/file/StaticGenerator.java";
 //        System.out.println(outputFilePath);
@@ -185,12 +185,6 @@ public abstract class GenerateTemplate {
 //        System.out.println("outputFilePath: " + outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
 
-        // README.md.ftl
-        inputFilePath = inputResourcePath + File.separator + "template/README.md.ftl";
-//        System.out.println("inputFilePath: " + inputFilePath);
-        outputFilePath = outputPath + File.separator + "/README.md";
-//        System.out.println("outputFilePath: " + outputFilePath);
-        DynamicFileGenerator.doGenerate(inputFilePath,outputFilePath, meta);
     }
 
     /**

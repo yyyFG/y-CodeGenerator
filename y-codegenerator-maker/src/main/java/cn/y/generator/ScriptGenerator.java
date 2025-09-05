@@ -1,4 +1,4 @@
-package cn.y.generator.file;
+package cn.y.generator;
 
 
 import cn.hutool.core.io.FileUtil;
