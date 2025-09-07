@@ -3,6 +3,7 @@ package cn.y.generator.main;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import cn.y.generator.file.DynamicFileGenerator;
 import cn.y.generator.JarGenerator;
 import cn.y.generator.ScriptGenerator;
@@ -46,12 +47,14 @@ public abstract class GenerateTemplate {
 
     /**
      * 生成精简版程序
+     *
      * @param outputPath
      * @param sourceCopyDestPath
      * @param jarPath
      * @param shellOutputFilePath
+     * @return 产物包路径
      */
-    protected void buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath){
+    protected String buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath) {
         String distOutputPath = outputPath + "-dist";
         // 拷贝 jar 包
         String targetAbsolutePath = distOutputPath + File.separator + "target";
@@ -62,7 +65,9 @@ public abstract class GenerateTemplate {
         FileUtil.copy(shellOutputFilePath, distOutputPath, true);
         // 拷贝源模板文件
         FileUtil.copy(sourceCopyDestPath, distOutputPath, true);
+        return distOutputPath;
     }
+
 
     /**
      * 封装脚本
@@ -201,4 +206,17 @@ public abstract class GenerateTemplate {
 
         return sourceCopyDestPath;
     }
+
+    /**
+     * 制作压缩包
+     *
+     * @param outputPath
+     * @return 压缩包路径
+     */
+    protected String buildZip(String outputPath) {
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath, zipPath);
+        return zipPath;
+    }
+
 }

@@ -1,6 +1,8 @@
 package cn.y;
 
+import cn.y.generator.main.GenerateTemplate;
 import cn.y.generator.main.MainGenerator;
+import cn.y.generator.main.ZipGenerator;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -28,7 +30,8 @@ public class Main {
 //        CommandExecutor commandExecutor = new CommandExecutor();
 //        commandExecutor.doExecute(args);
 
-        MainGenerator mainGenerator = new MainGenerator();
-        mainGenerator.doGenerate();
+//        MainGenerator mainGenerator = new MainGenerator();
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        generateTemplate.doGenerate();
     }
 }
